@@ -65,4 +65,26 @@ class ResourceCheckUI:
         self.timer_label.config(text="Время записи: 0 сек")
 
     def update_timer(self):
-        if self.recording
+        if self.recording:
+            elapsed = self.logic.get_elapsed_time(self.start_time)
+            self.timer_label.config(text=f"Время записи: {elapsed} сек")
+            self.root.after(1000, self.update_timer)
+
+    def show_history(self):
+        history_window = tk.Toplevel(self.root)
+        history_window.title("История записей")
+        history_window.geometry("800x400")
+
+        tree = ttk.Treeview(history_window, columns=("timestamp", "cpu", "ram", "ram_free", "ram_total", "disk", "disk_free", "disk_total"), show="headings")
+        tree.heading("timestamp", text="Время")
+        tree.heading("cpu", text="ЦП")
+        tree.heading("ram", text="ОЗУ (%)")
+        tree.heading("ram_free", text="ОЗУ Свободно (ГБ)")
+        tree.heading("ram_total", text="ОЗУ Всего (ГБ)")
+        tree.heading("disk", text="ПЗУ (%)")
+        tree.heading("disk_free", text="ПЗУ Свободно (ГБ)")
+        tree.heading("disk_total", text="ПЗУ Всего (ГБ)")
+        tree.pack(fill=tk.BOTH, expand=True)
+
+        for row in self.logic.get_history():
+            tree.insert("", tk.END, values=row)
